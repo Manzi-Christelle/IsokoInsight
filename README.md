@@ -1,6 +1,6 @@
-# AagricultureInsight Rwanda - Food security Monitoring
+# AgricultureInsight Rwanda - Food security Monitoring
 
-NISR 2026 Big Data Hackathon entry. Track 1 (Agricultural Productivity) with elements of Track 3 (Open Innovation).
+NISR 2026 Big Data Hackathon entry. 
 
 AgricultureInsight shows where food prices are high in Rwanda and gives a plain-language answer to questions about them. It keeps two kinds of information apart:
 
