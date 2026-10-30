@@ -83,8 +83,8 @@ python -m pytest -q
 `demo/demo.webm` (3 minutess): a walkthrough of the overview, market prices, comparison, the district map, weather and climate, IsokoBot and login sample.
 
 ## Submission details
-- Public GitHub repository: (https://github.com/Manzi-Christelle/IsokoInsight.git)
-- Deployed app: 
+- Public GitHub repository: https://github.com/Manzi-Christelle/IsokoInsight.git
+- Deployed app: https://agricultureinsight-rwanda.onrender.com/
 
 ## Team and student eligibility
 - Team: MUCYO MANZI Marie Christelle (team leader) and MUGISHA Kevin.
