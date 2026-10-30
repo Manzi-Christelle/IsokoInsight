@@ -66,7 +66,7 @@ python -m app.seed --demo
 uvicorn app.main:app --reload
 ```
 Open http://localhost:8000 (dashboard) and http://localhost:8000/docs (API documentation).
-The admin account is the `ADMIN_EMAIL` / `ADMIN_PASSWORD` in your `.env`.
+The admin account is the `ADMIN_EMAIL= admin@isoko.com` / `ADMIN_PASSWORD= adminPassword123`.
 
 ## Run with PostgreSQL (Docker Desktop)
 ```bash
