@@ -83,9 +83,8 @@ python -m pytest -q
 `demo/demo.webm` (3 minutess): a walkthrough of the overview, market prices, comparison, the district map, weather and climate, IsokoBot and login sample.
 
 ## Submission details
-- Public GitHub repository: `<to be added by the team>`
-- Deployed app: `<to be added by the team>`
-- Sample reviewer login (required because the Review tab needs an administrator; contributors can also register): `<to be provided separately with the submission form, not stored in this repository>`
+- Public GitHub repository: (https://github.com/Manzi-Christelle/IsokoInsight.git)
+- Deployed app: 
 
 ## Team and student eligibility
 - Team: MUCYO MANZI Marie Christelle (team leader) and MUGISHA Kevin.
@@ -160,4 +159,4 @@ Upgrading an existing copy:
   original four markets keep their figures.
 
 Upgrading an existing database: run `python -m app.seed --demo` again. It adds only what is missing.
-Remove all demo records before submission with `python -m app.seed --purge-demo`.
+
