@@ -1,8 +1,8 @@
-# IsokoInsight Rwanda - Food Price Monitoring
+# AagricultureInsight Rwanda - Food security Monitoring
 
 NISR 2026 Big Data Hackathon entry. Track 1 (Agricultural Productivity) with elements of Track 3 (Open Innovation).
 
-IsokoInsight shows where food prices are high in Rwanda and gives a plain-language answer to questions about them. It keeps two kinds of information apart:
+AgricultureInsight shows where food prices are high in Rwanda and gives a plain-language answer to questions about them. It keeps two kinds of information apart:
 
 - **Official NISR statistics**: national Consumer Price Index (CPI) figures and headline inflation, as published by NISR.
 - **Verified local market prices**: item prices collected at markets, shown only after an administrator has checked them.
@@ -19,7 +19,7 @@ IsokoInsight shows where food prices are high in Rwanda and gives a plain-langua
 | NISR data | NISR statisticians download the full dataset (including pending and rejected records) and generate statistics. |
 | Review | Administrators approve, correct or reject submissions, manage accounts, and see the audit trail. |
 | Sources | Source register with publisher, period, download date and processing for every dataset. |
-| **Ask IsokoBot** (button, bottom right) | Ask questions in plain language, for example "Which districts are in the critical zone?", "Price of maize flour in Huye" or "What is headline inflation?". |
+| **Ask AgricultureBot** (button, bottom right) | Ask questions in plain language, for example "Which districts are in the critical zone?", "Price of maize flour in Huye" or "What is headline inflation?". |
 
 ### How the district colours work
 1. For each product and unit, the **national median** is the median of the latest verified price across markets.
@@ -30,7 +30,7 @@ IsokoInsight shows where food prices are high in Rwanda and gives a plain-langua
 
 The thresholds are set in `app/config.py` and explained in `docs/METHODOLOGY.md`. A colour is a prompt for attention, not proof of a shortage.
 
-### How IsokoBot works
+### How AgricultureBot works
 IsokoBot answers only from the app's database and recorded NISR figures. It does not guess. Every answer names its sources, pending submissions are never quoted, and synthetic demo data is always labelled. It understands English and common Kinyarwanda product names (for example *ibigori* for maize, *ibirayi* for potatoes, *amavuta* for cooking oil). The Kinyarwanda terms still need checking by a native speaker.
 
 ## Accounts and roles
