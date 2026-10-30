@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: isoko
+      POSTGRES_PASSWORD: isoko
+      POSTGRES_DB: isoko
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U isoko"]
+      interval: 5s
+      retries: 10
+  web:
+    build: .
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgresql+psycopg2://isoko:isoko@db:5432/isoko
+      SECRET_KEY: ${SECRET_KEY:-local-dev-secret-key-change-me-0123456789}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-ChangeThisPassword123}
+    ports: ["8000:8000"]
+volumes:
+  pgdata:

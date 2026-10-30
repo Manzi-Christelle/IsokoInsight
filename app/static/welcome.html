@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcome - AgricultureInsight Rwanda</title>
+<meta name="description" content="Welcome to AgricultureInsight Rwanda: food prices, district indicators, weather and climate.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%230b5ea8%27/%3E%3C/svg%3E">
+<link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
+<style>
+:root{--bg:#f3f7fb;--card:#ffffff;--ink:#0b2540;--muted:#405a73;--line:#cfdcea;--brand:#0b5ea8;--brand-ink:#ffffff;--warn:#fff4c2;--warn-ink:#5c4300}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1a2c;--card:#11263d;--ink:#e9f1fa;--muted:#a8bdd3;--line:#2a4663;--brand:#4a9be0;--brand-ink:#06182b;--warn:#3a3011;--warn-ink:#f2d98a}}
+:root[data-theme="dark"]{--bg:#0a1a2c;--card:#11263d;--ink:#e9f1fa;--muted:#a8bdd3;--line:#2a4663;--brand:#4a9be0;--brand-ink:#06182b;--warn:#3a3011;--warn-ink:#f2d98a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+a:focus-visible,button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+header.top{display:flex;align-items:center;gap:10px;padding:14px 18px;margin:16px 0 8px;background:var(--brand);color:#fff;border-radius:14px}
+header.top .logo{background:#fff;color:var(--brand)}header.top .brand small{color:#dbe9f7}
+.logo{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;background:var(--brand);color:var(--brand-ink);font-weight:700}
+.brand strong{display:block}.brand small{color:var(--muted)}
+.welcome-link{color:var(--brand);font-weight:600}
+h1{font-size:clamp(1.6rem,4vw,2.3rem);line-height:1.2;margin:12px 0 8px}
+.lead{color:var(--muted);font-size:1.05rem;margin:0 0 20px;max-width:70ch}
+.demo{background:var(--warn);color:var(--warn-ink);border-radius:10px;padding:10px 14px;font-size:.92rem;margin:0 0 20px}
+.slideshow{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;position:relative}
+.stage{position:relative;aspect-ratio:3/2;background:#0002;display:grid}
+.slide{grid-area:1/1;margin:0;opacity:0;transition:opacity .6s ease;display:flex;flex-direction:column}
+.slide.on{opacity:1}
+.slide img{width:100%;height:100%;object-fit:cover;display:block;flex:1;min-height:0}
+.slide figcaption{padding:10px 14px;font-size:.95rem;color:var(--ink);background:var(--card);border-top:1px solid var(--line)}
+.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px}
+.controls button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer;min-width:44px;min-height:40px}
+.dots{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.dots button{width:12px;height:12px;min-width:12px;min-height:12px;padding:0;border-radius:99px;border:0;background:var(--line);cursor:pointer}
+.dots button[aria-current="true"]{background:var(--brand)}
+.count{color:var(--muted);font-size:.9rem;min-width:52px;text-align:center}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:24px 0 8px}
+.cta a{background:var(--brand);color:var(--brand-ink);text-decoration:none;font-weight:700;padding:14px 22px;border-radius:10px;font-size:1.05rem}
+.cta span{color:var(--muted);font-size:.95rem}
+.topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:28px 0}
+.topics div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.topics b{display:block;margin-bottom:4px}
+.topics p{margin:0;color:var(--muted);font-size:.93rem}
+footer{color:var(--muted);font-size:.85rem;padding:24px 0 32px}
+@media (max-width:560px){.stage{aspect-ratio:4/3}.slide figcaption{font-size:.9rem}}
+@media (prefers-reduced-motion:reduce){.slide{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+      <img class="logo" src="/static/img/logo.svg" alt="" width="40" height="40">
+    <div class="brand"><strong>AgricultureInsight Rwanda</strong><small>Agriculture statistics and status review</small></div>
+  </header>
+
+  <main>
+    <h1>Welcome to AgricultureInsight Rwanda</h1>
+    <p class="lead">Follow food prices in Rwanda's markets, compare districts, and see how rainfall and temperature
+      may affect farming. Official NISR statistics are kept apart from local market observations.</p>
+    <p class="demo" role="note">Some figures in this app are synthetic demonstration data. Every screen labels them.</p>
+
+    <section class="slideshow" aria-roledescription="carousel" aria-label="Photos from Rwanda's food system">
+      <div class="stage" id="stage">
+        <figure class="slide on" data-i="0"><img src="/static/img/01-dairy-milk-collection.jpg" alt="A farmer pours fresh milk into a metal churn while cows graze nearby" width="736" height="489"><figcaption>Dairy: milk moves from the farm to the market.</figcaption></figure>
+        <figure class="slide" data-i="1"><img src="/static/img/02-fertiliser-application.jpg" alt="A farmer carries fertiliser in a green basin and spreads it across a maize field" width="740" height="489" loading="lazy"><figcaption>Farm inputs: fertiliser and seed shape harvests and prices.</figcaption></figure>
+        <figure class="slide" data-i="2"><img src="/static/img/03-farmer-mobile-phone.jpg" alt="A smiling farmer checks his phone in a maize field" width="743" height="496" loading="lazy"><figcaption>Information in the field: phones bring prices and weather to farmers.</figcaption></figure>
+        <figure class="slide" data-i="3"><img src="/static/img/04-market-produce.jpg" alt="Market stalls with peas, bananas, tomatoes, beans and sacks of flour" width="683" height="493" loading="lazy"><figcaption>Markets: vegetables, fruit, cereals and pulses sold every day.</figcaption></figure>
+        <figure class="slide" data-i="4"><img src="/static/img/05-tea-harvest.jpg" alt="A woman harvests tea leaves on a green hillside" width="850" height="485" loading="lazy"><figcaption>Export crops: tea harvests depend on steady rain and weather.</figcaption></figure>
+        <figure class="slide" data-i="5"><img src="/static/img/06-drought-field.jpg" alt="Cracked dry soil beside a green crop field at sunset" width="732" height="497" loading="lazy"><figcaption>Dry spells: too little rain can cut yields.</figcaption></figure>
+        <figure class="slide" data-i="6"><img src="/static/img/07-cash-and-prices.jpg" alt="A man holds a fan of Rwandan franc banknotes and coins" width="738" height="498" loading="lazy"><figcaption>Prices: what a franc buys is what this app tracks.</figcaption></figure>
+      </div>
+      <div class="controls">
+        <button type="button" id="prev" aria-label="Previous photo">&larr; Previous</button>
+        <div class="dots" id="dots" role="group" aria-label="Choose a photo"></div>
+        <span class="count" id="count" aria-live="off">1 / 7</span>
+        <button type="button" id="next" aria-label="Next photo">Next &rarr;</button>
+      </div>
+    </section>
+
+    <div class="topics" aria-label="What you will find">
+      <div><b>Market prices</b><p>Verified local prices for meat, dairy, fruit, vegetables and cereals, with a map by district.</p></div>
+      <div><b>Compare and map</b><p>See which districts pay more or less than the national median.</p></div>
+      <div><b>Indicators</b><p>District indicators by year, with year-on-year change and a food security score.</p></div>
+      <div><b>Weather and climate</b><p>Rainfall and temperature against normal, and what they may mean for farming.</p></div>
+    </div>
+
+    <div class="cta">
+      <a href="/dashboard" id="continue">Continue to dashboard</a>
+      <span>All information is on the dashboard. No account is needed to look around.</span>
+    </div>
+  </main>
+
+  <footer>AgricultureInsight Rwanda - built for the NISR 2026 Big Data Hackathon.</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var dotsBox = document.getElementById("dots"), count = document.getElementById("count");
+  var stage = document.getElementById("stage");
+  var current = 0, timer = null, paused = false;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  slides.forEach(function (s, i) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("aria-label", "Show photo " + (i + 1));
+    b.addEventListener("click", function () { show(i); restart(); });
+    dotsBox.appendChild(b);
+  });
+
+  function show(i) {
+    current = (i + slides.length) % slides.length;
+    slides.forEach(function (s, k) { s.classList.toggle("on", k === current); s.setAttribute("aria-hidden", k === current ? "false" : "true"); });
+    Array.prototype.forEach.call(dotsBox.children, function (d, k) { d.setAttribute("aria-current", k === current ? "true" : "false"); });
+    count.textContent = (current + 1) + " / " + slides.length;
+  }
+  function restart() {
+    clearInterval(timer);
+    if (!reduce && !paused) timer = setInterval(function () { show(current + 1); }, 3000);
+  }
+  document.getElementById("prev").addEventListener("click", function () { show(current - 1); restart(); });
+  document.getElementById("next").addEventListener("click", function () { show(current + 1); restart(); });
+  stage.addEventListener("mouseenter", function () { paused = true; restart(); });
+  stage.addEventListener("mouseleave", function () { paused = false; restart(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") { show(current - 1); restart(); }
+    if (e.key === "ArrowRight") { show(current + 1); restart(); }
+  });
+  show(0);
+  restart();
+})();
+</script>
+</body>
+</html>

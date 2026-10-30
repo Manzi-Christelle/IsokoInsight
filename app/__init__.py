@@ -1,0 +1,1 @@
+"""this file tells Python that the app folder is a package, a module that contains other modules. That lets the rest of the project import from it."""

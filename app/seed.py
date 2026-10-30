@@ -1,0 +1,158 @@
+"""Seed the database.
+
+  python -m app.seed                # reference data + admin user + NISR headline indicators
+  python -m app.seed --demo         # also add SYNTHETIC demo prices and CPI (clearly labelled)
+  python -m app.seed --purge-demo   # remove every synthetic record (do this before submission)
+"""
+import random
+import sys
+from datetime import date
+from pathlib import Path
+
+from sqlalchemy.orm import Session
+
+from .climate import CLIMATE_YEARS, simulate
+from .demo_prices import demo_price_rows, expected_demo_rows
+from .config import settings
+from .db import Base, SessionLocal, engine, ensure_schema
+from .importers.cpi import load_cpi, parse_cpi
+from .importers.indicators import load_national_figures, load_synthetic_workbooks
+from .models import (ClimateObservation, DataSource, IndicatorValue, Market, OfficialIndicator,
+                     OfficialSeries, OfficialValue, PriceObservation, Product, User)
+from .reference import MARKETS, PRODUCTS
+from .security import hash_password
+
+NISR_CPI_FILE = Path(__file__).parent / "data" / "cpi" / "nisr_cpi_all_rwanda_2009_2026.csv"
+NISR_CPI_SOURCE = "NISR CPI time series, All Rwanda (August 2026 release)"
+# Hand-typed headline figures used before the real CPI table was loaded. They are removed on seeding.
+NISR_CPI_TYPED_SOURCE = "NISR Consumer Price Index release, August 2026"
+DEMO_PRICES = "DEMO - synthetic market prices"
+DEMO_CPI = "DEMO - synthetic CPI series"
+DEMO_CLIMATE = "DEMO - synthetic rainfall and temperature"
+
+
+def get_or_create_source(db: Session, name: str, **kw) -> DataSource:
+    s = db.query(DataSource).filter_by(name=name).one_or_none()
+    if not s:
+        s = DataSource(name=name, **kw)
+        db.add(s)
+        db.flush()
+    return s
+
+
+def remove_typed_cpi_figures(db: Session) -> None:
+    """Delete the hand-typed headline figures. The real CPI table replaces them."""
+    old = db.query(DataSource).filter_by(name=NISR_CPI_TYPED_SOURCE).one_or_none()
+    if old:
+        db.query(OfficialIndicator).filter_by(source_id=old.id).delete()
+        db.delete(old)
+        db.flush()
+
+
+def remove_demo_cpi(db: Session) -> None:
+    """Delete the synthetic CPI series from earlier demo seeds."""
+    demo = db.query(DataSource).filter_by(name=DEMO_CPI).one_or_none()
+    if demo:
+        for s in db.query(OfficialSeries).filter_by(source_id=demo.id):
+            db.query(OfficialValue).filter_by(series_id=s.id).delete()
+            db.delete(s)
+        db.delete(demo)
+        db.flush()
+
+
+def load_official_cpi(db: Session) -> None:
+    """Load the real NISR CPI table (All Rwanda) and calculate headline inflation from it."""
+    src = get_or_create_source(
+        db, NISR_CPI_SOURCE, publisher="National Institute of Statistics of Rwanda (NISR)",
+        url="https://statistics.gov.rw", period="February 2009 to August 2026",
+        downloaded_on=date(2026, 10, 29),
+        description="NISR consumer price index, All Rwanda, base February 2014 = 100. Taken from the NISR "
+                    "file CPI_time_series_August_2026.xls (Table D).",
+        transformations="Table D exported to app/data/cpi/nisr_cpi_all_rwanda_2009_2026.csv with the NISR "
+                        "series codes kept. Headline inflation is the year-on-year change of the general index.",
+        is_synthetic=False)
+    load_cpi(db, parse_cpi(NISR_CPI_FILE.read_bytes()), src)
+    general = db.query(OfficialSeries).filter_by(name="00 GENERAL INDEX (CPI)").one()
+    values = {v.period: v.index_value for v in db.query(OfficialValue).filter_by(series_id=general.id)}
+    db.query(OfficialIndicator).filter_by(source_id=src.id).delete()
+    for period in sorted(values):
+        last_year = date(period.year - 1, period.month, 1)
+        if last_year in values:
+            yoy = round((values[period] / values[last_year] - 1) * 100, 1)
+            db.add(OfficialIndicator(name="Headline inflation, year-on-year", period=period, value=yoy,
+                                     unit="% year-on-year", source_id=src.id))
+    db.commit()
+
+
+def seed_reference(db: Session) -> None:
+    for n, c, u in PRODUCTS:
+        if not db.query(Product).filter_by(name=n).first():
+            db.add(Product(name=n, category=c, standard_unit=u))
+    for n, d in MARKETS:
+        if not db.query(Market).filter_by(name=n, district=d).first():
+            db.add(Market(name=n, district=d))
+    if not db.query(User).filter_by(email=settings.admin_email.lower()).first():
+        db.add(User(email=settings.admin_email.lower(), role="admin", status="active",
+                    full_name="Administrator", password_hash=hash_password(settings.admin_password)))
+    remove_typed_cpi_figures(db)
+    remove_demo_cpi(db)
+    load_official_cpi(db)
+    load_national_figures(db)  # real national input figures, each row keeps its source note
+    db.commit()
+
+
+def seed_demo(db: Session) -> None:
+    prices_src = get_or_create_source(
+        db, DEMO_PRICES, publisher="Generated by this project", is_synthetic=True,
+        description="SYNTHETIC values for demonstration only (monthly, January 2000 to August 2026). "
+                    "They are NOT real Rwandan prices.")
+    products = db.query(Product).order_by(Product.id).all()
+    markets = db.query(Market).order_by(Market.id).all()
+    expected = expected_demo_rows(len(products), len(markets))
+    present = db.query(PriceObservation).filter_by(is_synthetic=True).count()
+    if present != expected:  # first seed, or the product/market list changed: rebuild the demo prices
+        db.query(PriceObservation).filter_by(is_synthetic=True).delete()
+        for batch in demo_price_rows(products, markets, prices_src.id):
+            db.bulk_insert_mappings(PriceObservation, batch)
+        db.flush()
+    climate_src = get_or_create_source(
+        db, DEMO_CLIMATE, publisher="Generated by this project", is_synthetic=True,
+        description="SYNTHETIC monthly rainfall and temperature for demonstration only. They are NOT "
+                    "Rwanda Meteorology Agency observations.")
+    if not db.query(ClimateObservation).filter_by(source_id=climate_src.id).first():
+        for district, year, month, rain, temp in simulate(random.Random(2028)):
+            db.add(ClimateObservation(district=district, year=year, month=month, rain_mm=rain,
+                                      temp_c=temp, source_id=climate_src.id))
+    loaded = load_synthetic_workbooks(db)  # district indicator workbooks (SYNTHETIC)
+    if loaded:
+        print("Loaded synthetic district indicator rows:", loaded)
+    db.commit()
+
+
+def purge_demo(db: Session) -> None:
+    db.query(PriceObservation).filter_by(is_synthetic=True).delete()
+    synthetic_ids = [s.id for s in db.query(DataSource).filter_by(is_synthetic=True)]
+    db.query(IndicatorValue).filter(IndicatorValue.source_id.in_(synthetic_ids)).delete(synchronize_session=False)
+    db.query(ClimateObservation).filter(ClimateObservation.source_id.in_(synthetic_ids)).delete(synchronize_session=False)
+    for src in db.query(DataSource).filter_by(is_synthetic=True):
+        for s in db.query(OfficialSeries).filter_by(source_id=src.id):
+            db.query(OfficialValue).filter_by(series_id=s.id).delete()
+            db.delete(s)
+        db.delete(src)
+    db.commit()
+
+
+if __name__ == "__main__":
+    Base.metadata.create_all(engine)
+    ensure_schema(engine)
+    with SessionLocal() as session:
+        if "--purge-demo" in sys.argv:
+            purge_demo(session)
+            print("Synthetic demo data removed.")
+        else:
+            seed_reference(session)
+            if "--demo" in sys.argv:
+                seed_demo(session)
+                print("Seeded reference data and SYNTHETIC demo data.")
+            else:
+                print("Seeded reference data (no demo data).")

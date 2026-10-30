@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in - AgricultureInsight Rwanda</title>
+<meta name="description" content="Sign in or create an AgricultureInsight account.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%231f6f4a%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/styles.css">
+
+<link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+      <img class="logo" src="/static/img/logo.svg" alt="" width="40" height="40">
+      <div><strong>AgricultureInsight Rwanda</strong><small>Sign in or create an account</small></div></div>
+    <nav aria-label="Main"><a class="btn" href="/dashboard">Back to dashboard</a></nav>
+  </div>
+</header>
+
+<main id="main" class="wrap account">
+  <h1>Account</h1>
+  <p class="lead">Your role decides what you can see and do. Everyone can read the public dashboard without an account.</p>
+
+  <div class="grid two">
+    <div class="card">
+      <h2>Sign in</h2>
+      <form id="loginForm" novalidate>
+        <label>Email <input type="email" id="lEmail" required autocomplete="username"></label>
+        <label>Password <input type="password" id="lPass" required autocomplete="current-password"></label>
+        <button class="primary" type="submit">Sign in</button>
+      </form>
+      <p id="loginMsg" class="muted" role="status"></p>
+    </div>
+
+    <div class="card">
+      <h2>Create an account</h2>
+      <form id="signupForm" novalidate>
+        <label>Full name <input type="text" id="sName" required minlength="2" maxlength="200" autocomplete="name"></label>
+        <label>Email <input type="email" id="sEmail" required autocomplete="email"></label>
+        <label>Password <input type="password" id="sPass" required minlength="8" maxlength="128" autocomplete="new-password"
+          aria-describedby="passHelp"></label>
+        <p id="passHelp" class="muted">At least 8 characters.</p>
+        <label>I am a
+          <select id="sRole" required>
+            <option value="customer">Customer: read prices, compare markets, download verified data</option>
+            <option value="farmer_seller">Farmer or seller: report market prices and track them</option>
+            <option value="enumerator">Enumerator: field data collector (needs approval)</option>
+            <option value="nisr">NISR statistician: export data and generate statistics (needs approval)</option>
+          </select></label>
+        <label id="orgLabel" hidden>Organisation <input type="text" id="sOrg" maxlength="200" autocomplete="organization"></label>
+        <p id="roleNote" class="muted"></p>
+        <button class="primary" type="submit">Create account</button>
+      </form>
+      <p id="signupMsg" class="muted" role="status"></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>What each role can do</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Capability</th><th>Public</th><th>Customer</th><th>Farmer / seller</th><th>Enumerator</th><th>NISR</th><th>Admin</th></tr></thead>
+      <tbody>
+        <tr><td>Dashboard, market prices, compare, district map, AgricultureBot</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Download verified prices (CSV)</td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Submit market prices</td><td>No</td><td>No</td><td>Yes</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+        <tr><td>See status of own submissions</td><td>No</td><td>No</td><td>Yes</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+        <tr><td>Export full dataset (incl. pending and rejected)</td><td>No</td><td>No</td><td>No</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Generate statistics</td><td>No</td><td>No</td><td>No</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Verify, correct or reject prices; approve accounts; import CPI; audit trail</td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td><td>Yes</td></tr>
+      </tbody>
+    </table></div>
+    <p class="muted">Enumerator and NISR accounts are approved by an administrator before they can sign in.</p>
+  </div>
+</main>
+
+<footer class="wrap muted foot">AgricultureInsight Rwanda - built for the NISR 2026 Big Data Hackathon.</footer>
+<script src="/static/account.js"></script>
+</body>
+</html>

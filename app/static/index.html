@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgricultureInsight Rwanda</title>
+<meta name="description" content="Food security monitoring: food-security statistics and verified market prices.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%231f6f4a%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/styles.css">
+<link rel="stylesheet" href="/static/styles.css?v=13">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="wrap bar">
+          <div class="brand"><img class="logo" src="/static/img/logo.svg" alt="" width="40" height="40"><div><strong>AgricultureInsight Rwanda</strong><small>Food security monitoring</small></div></div>
+     </div>
+    <nav aria-label="Main" id="tabs">
+      <button data-tab="overview" class="active">Overview</button>
+      <button data-tab="prices">Market prices</button>
+      <button data-tab="map">Compare and map</button>
+      <button data-tab="indicators">Indicators map</button>
+      <button data-tab="climate">Weather and climate</button>
+      <button data-tab="contribute">Contribute</button>
+      <button data-tab="nisr" id="nisrTab" hidden>NISR data</button>
+      <button data-tab="admin" id="adminTab" hidden>Review</button>
+      <button data-tab="sources">Sources</button>
+    </nav>
+    <div id="accountBox" class="acct"></div>
+  </div>
+</header>
+
+<div id="demoBanner" class="banner" hidden>
+  DEMO DATA: some values shown here are synthetic examples, not real Rwandan figures.
+</div>
+
+<main id="main" class="wrap">
+
+<section id="tab-overview" class="tab">
+  <h1>What is happening to food security?</h1>
+  <p class="lead">Official national statistics from NISR are shown separately from local market observations.</p>
+  <div id="kpis" class="grid kpis"></div>
+
+  <div class="card">
+    <div class="row">
+      <h2>Official CPI trend <span class="tag official">NISR official statistics</span></h2>
+      <label>Series
+        <select id="seriesSelect"></select></label>
+      <label>Show
+        <select id="seriesMetric"><option value="yoy_pct">Year-on-year change (%)</option>
+          <option value="mom_pct">Month-on-month change (%)</option>
+          <option value="value">Index level</option></select></label>
+    </div>
+    <div class="chartbox"><canvas id="cpiChart" role="img" aria-label="CPI trend chart"></canvas></div>
+    <div id="flags"></div>
+    <p class="muted" id="cpiSource"></p>
+  </div>
+
+  <div class="card">
+    <h2>Which categories are rising fastest?</h2>
+    <div class="tablewrap"><table id="seriesTable"><thead><tr><th>Category</th><th>Latest month</th>
+      <th class="num">Year-on-year</th><th class="num">Month-on-month</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<section id="tab-prices" class="tab" hidden>
+  <h1>Verified market prices <span class="tag local">Local observations</span></h1>
+  <div class="card filters">
+    <label>Product <select id="fProduct"><option value="">All</option></select></label>
+    <label>Market <select id="fMarket"><option value="">All</option></select></label>
+    <label>From <input type="date" id="fFrom"></label>
+    <label>To <input type="date" id="fTo"></label>
+    <button id="fApply" class="primary">Search</button>
+    <button id="fExport" class="btn" type="button">Download CSV</button>
+  </div>
+  <p class="muted" id="fRange" aria-live="polite"></p>
+  <p class="err" id="fError" role="alert" hidden></p>
+  <div class="card">
+    <div class="chartbox"><canvas id="histChart" role="img" aria-label="Price history chart"></canvas></div>
+    <h2>Price history by market</h2>
+    <p class="muted" id="histNote">Choose a product and press Search to see how its verified price changed over the dates you chose. Each line is one market; the table below lists the same records.</p>
+    <div class="tablewrap"><table id="priceTable"><thead><tr><th>Date</th><th>Product</th><th>Market</th>
+      <th class="num">Price (RWF)</th><th>Unit</th><th>Source</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <div class="card">
+    <h2>Price map by district <span class="tag local">Local observations</span> <span class="tag demo">Includes synthetic demo prices</span></h2>
+    <div class="filters">
+      <label>Product <select id="pmProduct" aria-label="Product for the price map"></select></label>
+    </div>
+    <p class="lead" id="pmLead"></p>
+    <div class="legend" id="pmLegend" aria-label="Price colour legend"></div>
+    <div class="grid mapgrid">
+      <div class="mapcard"><div id="pmMapBox" role="img" aria-label="Map of Rwanda's districts coloured by the average market price of the selected product"></div></div>
+      <div id="pmInfo" aria-live="polite"><p class="muted">Select a district on the map or in the table to see its markets and prices.</p></div>
+    </div>
+    <div id="pmTable"></div>
+    <p class="muted" id="pmNote"></p>
+  </div>
+</section>
+
+<section id="tab-contribute" class="tab" hidden>
+  <h1>Contribute a price</h1>
+  <div class="card" id="contribSignin">
+    <p>Farmers, sellers and enumerators can submit market prices after signing in. Submissions are checked by an administrator before they appear publicly.</p>
+    <p><a class="btn primary" href="/account">Sign in or create an account</a></p>
+  </div>
+  <div class="grid two" id="contribBody" hidden>
+    <div class="card" id="submitCard" hidden>
+      <h2>New observation</h2>
+      <p class="muted">Submissions stay <b>pending</b> until an administrator verifies them.</p>
+      <form id="submitForm">
+        <label>Product <select id="sProduct" required></select></label>
+        <label>Market <select id="sMarket" required></select></label>
+        <label>Price (RWF per <span id="sUnit">unit</span>) <input type="number" id="sPrice" min="1" step="1" required></label>
+        <label>Date observed <input type="date" id="sDate" required></label>
+        <label>How was it collected? <input type="text" id="sMethod" value="enumerator visit" maxlength="100"></label>
+        <button class="primary" type="submit">Submit for verification</button>
+      </form>
+      <p id="submitMsg" role="status"></p>
+    </div>
+    <div class="card" id="mineCard" hidden>
+      <h2>My submissions</h2>
+      <div class="tablewrap"><table id="mineTable"><thead><tr><th>Date</th><th>Product</th><th>Market</th>
+        <th class="num">Price (RWF)</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+      <p id="mineEmpty" class="muted" hidden>You have not submitted any prices yet.</p>
+    </div>
+  </div>
+</section>
+
+<section id="tab-nisr" class="tab" hidden>
+  <h1>NISR data and statistics <span class="tag official">NISR access</span></h1>
+  <p class="lead">Full price dataset with verification status, and statistics generated from verified records.</p>
+  <div class="card filters">
+    <button id="nisrCsv" class="primary" type="button">Download full dataset (CSV)</button>
+    <button id="nisrStats" type="button">Generate statistics</button>
+  </div>
+  <div id="nisrOut"></div>
+</section>
+
+<section id="tab-map" class="tab" hidden>
+  <h1>Compare and map <span class="tag local">Local market prices</span></h1>
+  <div class="card filters">
+    <label>Product <select id="cProduct"></select></label>
+    <button id="cApply" class="primary" type="button">Compare and colour map</button>
+    <button id="cReset" type="button" hidden>Show overall colours</button>
+  </div>
+  <p class="lead" id="mapLead"></p>
+  <div class="card legend" id="legend" aria-label="Colour legend"></div>
+  <div class="grid mapgrid">
+    <div class="card mapcard"><div id="mapBox" role="img" aria-label="Map of Rwanda's 30 districts coloured by price status"></div></div>
+    <div class="card" id="districtInfo" aria-live="polite"><p class="muted">Select a district on the map or in the table below.</p></div>
+  </div>
+  <div class="card"><h2 id="tableTitle">All 30 districts</h2><div id="tableBox"></div>
+    <p class="muted" id="mapNote"></p></div>
+</section>
+
+<section id="tab-indicators" class="tab" hidden>
+  <h1>Indicators by district <span class="tag demo">SYNTHETIC DEMO VALUES</span></h1>
+  <div class="flag" role="note">These district values are randomly generated demonstration data. They are NOT NISR or census statistics and must not be used for analysis or reporting. The only non-synthetic figures here are the national agricultural input figures, which are marked as recorded.</div>
+  <div class="card filters">
+    <label>Indicator <select id="iSelect" aria-label="Indicator"></select></label>
+    <label id="iSeasonWrap" hidden>Season <select id="iSeason" aria-label="Season">
+      <option value="A">Season A (Sep to Feb)</option><option value="B">Season B (Mar to Jun)</option>
+      <option value="C">Season C (Jul to Sep)</option></select></label>
+    <label>Show <select id="iMode" aria-label="Show values or change"><option value="value">Values</option>
+      <option value="change">Change from the year before</option></select></label>
+  </div>
+  <div class="card ind-timeline">
+    <button id="iPlay" type="button" class="primary">Play years</button>
+    <label class="grow">Year <span class="yearout" id="iYearOut" aria-live="off">2025</span>
+      <input type="range" id="iYear" min="2000" max="2026" step="1" value="2025" aria-label="Year"></label>
+  </div>
+  <p class="lead" id="iLead"></p>
+  <div class="card legend" id="iLegend" aria-label="Colour legend"></div>
+  <div class="grid mapgrid">
+    <div class="card mapcard"><div id="iMapBox" role="img" aria-label="Map of Rwanda's districts coloured by the selected indicator"></div></div>
+    <div class="card" id="iDistrictInfo" aria-live="polite"><p class="muted">Select a district on the map or in the table below to see every indicator and its change from the year before.</p></div>
+  </div>
+  <div class="card"><h2>National summary for this year</h2><div id="iNational"></div></div>
+  <div class="card"><h2 id="iTableTitle">All districts</h2><div id="iTable"></div></div>
+  <div class="card">
+    <h2>Food security score by district and year</h2>
+    <p class="muted" id="iScoreNote"></p>
+    <div class="filters">
+      <label>Show <select id="iScoreMode" aria-label="Show score or change"><option value="score">Score (0 to 100)</option>
+        <option value="change">Change from the year before (points)</option></select></label>
+      <a class="btn" href="/api/indicators/food-security.csv" download>Download score table (CSV)</a>
+    </div>
+    <div class="tablewrap" id="iScoreBox"></div>
+  </div>
+  <p class="muted">District boundaries: <a href="https://www.geoboundaries.org" rel="noopener">geoBoundaries</a> (CC BY 4.0).</p>
+</section>
+
+<section id="tab-climate" class="tab" hidden>
+  <h1>Weather and climate by district <span class="tag demo">SYNTHETIC DEMO DATA</span></h1>
+  <div class="flag" role="note">Rainfall and temperature on this page are randomly generated demonstration data, not observations from the Rwanda Meteorology Agency. Do not use them for planning or reporting.</div>
+  <div class="card filters">
+    <label>Year <select id="clYear" aria-label="Year"></select></label>
+    <label>Compare <select id="clMetric" aria-label="Compare rainfall or temperature">
+      <option value="rain">Rainfall vs normal</option><option value="temp">Temperature vs normal</option></select></label>
+  </div>
+  <p class="lead" id="clLead"></p>
+  <div class="card legend" id="clLegend" aria-label="Colour legend"></div>
+  <div class="grid mapgrid">
+    <div class="card mapcard"><div id="clMapBox" role="img" aria-label="Map of Rwanda's districts coloured by rainfall or temperature compared with normal"></div></div>
+    <div class="card" id="clInfo" aria-live="polite"><p class="muted">Select a district on the map or in the table to see its monthly rainfall and temperature.</p></div>
+  </div>
+  <div class="card">
+    <h2>Monthly rainfall and temperature</h2>
+    <div class="chartbox"><canvas id="clChart" role="img" aria-label="Monthly rainfall and temperature for the selected district"></canvas></div>
+    <p class="muted" id="clChartNote"></p>
+  </div>
+  <div class="card" id="fcCard">
+    <h2>Forecast for the next months <span class="tag demo">MACHINE ESTIMATE, SYNTHETIC DATA</span></h2>
+    <div class="flag" role="note" id="fcLabel"></div>
+    <div class="card filters">
+      <label>District <select id="fcDistrict" aria-label="District for the forecast"></select></label>
+      <label>Measure <select id="fcVariable" aria-label="Rainfall or temperature">
+        <option value="rain">Rainfall</option><option value="temp">Temperature</option></select></label>
+      <label>Forecast length <select id="fcHorizon" aria-label="Forecast length">
+        <option value="1">1 month</option><option value="2">2 months</option><option value="3" selected>3 months</option>
+        <option value="4">4 months</option><option value="5">5 months</option><option value="6">6 months</option>
+        <option value="12">1 year (Dec 2026)</option><option value="60">Dec 2030</option>
+        <option value="120">Dec 2035</option><option value="180">Dec 2040</option>
+        <option value="240">Dec 2045</option><option value="300">Dec 2050</option></select></label>
+    </div>
+    <p class="lead" id="fcLead"></p>
+    <div class="chartbox"><canvas id="fcChart" role="img" aria-label="History and forecast with the 80 per cent range for the selected district"></canvas></div>
+    <h2>Forecast values</h2>
+    <div id="fcTable"></div>
+    <h2>How accurate was the method? (backtest)</h2>
+    <p class="muted">Each method was tested on earlier months and compared with the synthetic values that followed. The smoothing model is only useful where its error is lower than the climatology baseline.</p>
+    <div id="fcBacktest"></div>
+    <p class="muted" id="fcNote"></p>
+  </div>
+  <div class="card"><h2>All districts: rainfall, temperature and farming impact</h2><div id="clTable"></div></div>
+  <div class="card"><h2>What each impact class means for farming</h2><ul id="clGuide"></ul><p class="muted" id="clImpactNote"></p></div>
+  <p class="muted" id="clNote"></p>
+</section>
+
+<section id="tab-admin" class="tab" hidden>
+  <h1>Review submissions</h1>
+  <div class="card"><h2>Pending observations</h2>
+    <div class="tablewrap"><table id="pendingTable"><thead><tr><th>Date</th><th>Product</th><th>Market</th>
+      <th class="num">Price</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+    <p id="pendingEmpty" class="muted" hidden>Nothing waiting for review.</p></div>
+  <div class="card"><h2>Accounts</h2>
+    <div class="row"><label>Show <select id="userFilter"><option value="">All accounts</option>
+      <option value="pending">Waiting for approval</option><option value="active">Active</option>
+      <option value="disabled">Disabled</option></select></label></div>
+    <div class="tablewrap"><table id="userTable"><thead><tr><th>Name</th><th>Email</th><th>Organisation</th>
+      <th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+    <p id="userEmpty" class="muted" hidden>No accounts match this filter.</p></div>
+  <div class="card"><h2>Review flags</h2><ul id="alertList"></ul></div>
+  <div class="card"><h2>Audit trail</h2>
+    <div class="tablewrap"><table id="auditTable"><thead><tr><th>When</th><th>Obs.</th><th>Action</th>
+      <th>Old</th><th>New</th><th>Note</th></tr></thead><tbody></tbody></table></div></div>
+</section>
+
+<section id="tab-sources" class="tab" hidden>
+  <h1>Data sources and method</h1>
+  <div class="card"><h2>Source register</h2><div id="sourceList"></div></div>
+  <div class="card">
+    <h2>How calculations work</h2>
+    <ul>
+      <li><b>Change over time</b> = (new price - earlier price) / earlier price x 100.</li>
+      <li><b>Market comparison</b> = (market price - cheapest price) / cheapest price x 100, using the latest verified price per market and the same unit only.</li>
+      <li><b>Review flag</b> = a monthly change above the threshold, or a statistically unusual jump. It asks for a check; it does not claim a shortage or an error.</li>
+      <li>National CPI describes the average household basket. It is not the price of a single product in a single market.</li>
+    </ul>
+    <p class="muted">AI assistance was used to help build this project; see docs/AI_DISCLOSURE.md in the repository.</p>
+  </div>
+</section>
+
+</main>
+<footer class="wrap muted foot">AgricultureInsight Rwanda - built for the NISR 2026 Big Data Hackathon.
+  <a href="/docs">API documentation</a> | District boundaries: <a href="https://www.geoboundaries.org" rel="noopener">geoBoundaries</a> (CC BY 4.0)</footer>
+
+<button id="chatFab" class="chat-fab" type="button" aria-expanded="false" aria-controls="chatPanel">Ask AgricultureBot</button>
+<section id="chatPanel" class="chat-panel" role="dialog" aria-label="AgricultureBot chat" hidden>
+  <header class="chat-head"><strong>AgricultureBot</strong>
+    <span class="chat-head-buttons">
+      <button id="chatMax" type="button" aria-pressed="false" aria-label="Maximise chat">Maximise</button>
+      <button id="chatClose" type="button" aria-label="Close chat">Close</button>
+    </span></header>
+  <div id="chatLog" class="chat-log" aria-live="polite"></div>
+  <div id="chatChips" class="chat-chips"></div>
+  <form id="chatForm" class="chat-form">
+    <input id="chatInput" type="text" maxlength="500" placeholder="Ask about prices, districts or inflation" aria-label="Your question" autocomplete="off" required>
+    <button class="primary" type="submit">Send</button>
+  </form>
+  <p class="muted chat-foot">Answers use only verified data and recorded NISR figures. Demo values are labelled.</p>
+</section>
+
+<script src="/static/chart.umd.js"></script>
+<script src="/static/app.js"></script>
+<script src="/static/indicators.js"></script>
+<script src="/static/map-tools.js"></script>
+<script src="/static/climate.js"></script>
+<script src="/static/forecast.js"></script>
+<script src="/static/market-map.js"></script>
+</body>
+</html>
